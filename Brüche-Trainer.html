@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Brüche-Trainer</title>
+<style>
+:root{--bg1:#120e2e;--bg2:#2a2160;--card:rgba(255,255,255,.07);--line:rgba(255,255,255,.14);--text:#f4f2ff;--muted:#a9a3d6;--acc:#00e5ff;--acc2:#ff4ecd;--ok:#2be28a;--bad:#ff5c7a;--inbg:rgba(255,255,255,.1);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg1:#efeaff;--bg2:#d9ecff;--card:rgba(255,255,255,.75);--line:rgba(60,40,140,.18);--text:#1d1844;--muted:#5d5896;--acc:#6c3df5;--acc2:#e0239f;--inbg:#fff}}
+:root[data-theme="light"]{--bg1:#efeaff;--bg2:#d9ecff;--card:rgba(255,255,255,.75);--line:rgba(60,40,140,.18);--text:#1d1844;--muted:#5d5896;--acc:#6c3df5;--acc2:#e0239f;--inbg:#fff}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100vh;font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;color:var(--text);background:var(--bg1);background:linear-gradient(135deg,var(--bg1),var(--bg2)) fixed}
+main{max-width:860px;margin:0 auto;padding:20px 14px 60px}
+h1{margin:6px 0 2px;font-size:2rem;letter-spacing:.5px}
+h1 span{background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--muted);margin:0 0 16px}
+.bar-top{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px}
+.tabs{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);padding:5px;border-radius:999px}
+.tab{border:0;background:transparent;color:var(--muted);font:inherit;font-weight:700;padding:9px 16px;border-radius:999px;cursor:pointer}
+.tab.on{background:linear-gradient(90deg,var(--acc),var(--acc2));color:#0b0b1f}
+.cta{margin-left:auto;border:0;font:inherit;font-weight:800;color:#0b0b1f;background:linear-gradient(90deg,var(--acc2),#ffb347);padding:11px 20px;border-radius:999px;cursor:pointer;box-shadow:0 6px 18px rgba(255,78,205,.35);transition:transform .15s}
+.cta:hover{transform:translateY(-2px) rotate(-1deg)}
+.prog{display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--muted);font-weight:700}
+.track{flex:1;height:10px;border-radius:99px;background:var(--card);border:1px solid var(--line);overflow:hidden}
+.fill{height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--ok));transition:width .4s}
+.instr{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 16px;margin-bottom:16px}
+.task{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px 16px;margin-bottom:12px;backdrop-filter:blur(6px)}
+.task.done{border-color:var(--ok)}
+.eq{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px}
+.lab{font-weight:800;color:var(--acc);min-width:28px;font-size:1.2rem}
+.steps{display:contents}
+.step{display:inline-flex;align-items:center;gap:8px;animation:pop .25s}
+@keyframes pop{from{transform:scale(.7);opacity:0}to{transform:none;opacity:1}}
+.sign{font-size:1.7rem;font-weight:700;color:var(--muted)}
+.frac{display:inline-flex;flex-direction:column;align-items:center;gap:3px;min-width:64px}
+.frac .line{height:3px;width:100%;min-width:64px;background:var(--text);border-radius:2px}
+.frac input,.frac .nn{width:76px;height:44px;text-align:center;font:700 1.45rem inherit;font-family:inherit;color:var(--text);background:var(--inbg);border:2px solid var(--line);border-radius:12px;outline:none}
+.frac .nn{display:flex;align-items:center;justify-content:center;background:transparent;border-color:transparent}
+.frac input:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(0,229,255,.25)}
+.frac input.good{background:var(--ok);color:#06231a;border-color:var(--ok)}
+.frac input.bad{background:var(--bad);color:#2a0610;border-color:var(--bad)}
+.rm{border:0;background:transparent;color:var(--muted);font-size:1.3rem;cursor:pointer;padding:2px 6px}
+.rm:hover{color:var(--bad)}
+.plus{width:40px;height:40px;border-radius:50%;border:2px dashed var(--acc);background:transparent;color:var(--acc);font-size:1.7rem;line-height:1;cursor:pointer;margin-left:4px;transition:.15s}
+.plus:hover{background:var(--acc);color:#0b0b1f;transform:rotate(90deg)}
+.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:8px;min-height:24px}
+.tip{color:var(--muted);font-size:.92rem}
+.msg{font-weight:700;font-size:.95rem}
+.msg.ok{color:var(--ok)}.msg.no{color:var(--bad)}
+.sol{border:0;background:transparent;color:var(--muted);text-decoration:underline;font:inherit;font-size:.88rem;cursor:pointer;margin-left:auto}
+@media (max-width:520px){.frac input,.frac .nn{width:62px}.sign{font-size:1.4rem}}
+.act{margin-left:auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap}.act .cta{margin-left:0}
+.chk{color:var(--muted);font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:6px;cursor:pointer}
+.prn{border:2px solid var(--acc);background:transparent;color:var(--acc);font:inherit;font-weight:800;padding:9px 16px;border-radius:999px;cursor:pointer}
+.prn:hover{background:var(--acc);color:#0b0b1f}
+#sheet{display:none}
+.pf{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle}
+.pn{display:flex;align-items:center;justify-content:center;width:17mm;height:9mm;font:700 15pt Arial,sans-serif;color:#000}
+.pn.bx{border:.3mm dashed #888}
+.pl{display:block;width:100%;border-top:.5mm solid #000;margin:1mm 0}
+.pe{font:700 16pt Arial,sans-serif;margin:0 2mm;color:#000}
+@media print{
+@page{size:A4;margin:14mm}
+html,body{background:#fff!important;color:#000;min-height:0}
+main{display:none}
+#sheet{display:block;font-family:Arial,sans-serif;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+#sheet h2{margin:0 0 3mm;font-size:18pt}
+.pnm{font-size:11pt;margin-bottom:3mm}
+.pi{font-size:11pt;margin:0 0 8mm;color:#333}
+.pg{display:grid;gap:0 8mm}
+.pg.two{grid-template-columns:1fr 1fr;grid-template-rows:repeat(6,auto);grid-auto-flow:column}
+.pg.one{grid-template-columns:1fr}
+.pt{display:flex;flex-wrap:wrap;align-items:center;padding:4mm 0 7mm;border-bottom:.2mm solid #ccc;break-inside:avoid}
+.pt b{font-size:13pt;width:8mm}
+.pt2{width:100%;font-size:9.5pt;color:#555;margin-top:2mm}
+.pg.two .pn{width:16mm}
+.sl{break-before:page;page-break-before:always}
+.sg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6mm 4mm}
+.si{display:flex;align-items:center;break-inside:avoid}.si b{width:8mm;font-size:12pt}
+.sl .pn{width:14mm;height:8mm;font-size:13pt}
+}
+</style>
+</head>
+<body>
+<main>
+  <h1>Brüche-<span>Trainer</span></h1>
+  <p class="sub">Kürzen und erweitern – so lange üben, bis es sitzt.</p>
+  <div class="bar-top">
+    <div class="tabs">
+      <button class="tab on" data-m="k">Kürzen</button>
+      <button class="tab" data-m="n">Nenner 1000</button>
+    </div>
+    <span class="act"><label class="chk"><input type="checkbox" id="withSol" checked> mit Lösungsblatt</label><button class="prn" id="prn">🖨️ Drucken</button><button class="cta" id="neu">Neue Aufgaben</button></span>
+  </div>
+  <div class="prog"><span id="cnt">0 / 0</span><div class="track"><div class="fill" id="fill"></div></div></div>
+  <div class="instr" id="instr"></div>
+  <div id="list"></div>
+</main>
+<div id="sheet"></div>
+<script>
+const gcd=(a,b)=>b?gcd(b,a%b):a;
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[rnd(0,a.length-1)];
+let mode='k',tasks=[];
+
+function genK(){
+  const b=rnd(2,14),a=rnd(1,b-1);
+  if(gcd(a,b)!==1)return null;
+  const ks=[2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,18,20,21,22,24,25,30,50,100,250].filter(k=>k*b<=1000);
+  const k=pick(ks);
+  return {n0:a*k,d0:b*k,ansN:a,ansD:b,k};
+}
+function genN(){
+  const b=pick([2,4,5,8,10,20,25,40,50,125,200,250,500]),a=rnd(1,b-1);
+  if(gcd(a,b)!==1)return null;
+  const max=Math.min(250,Math.floor(999/b));
+  const k=(b>=20&&Math.random()<.4)||max<2?1:rnd(2,max);
+  if(b*k===1000||b*k<4)return null;
+  return {n0:a*k,d0:b*k,ansN:a*(1000/b),ansD:1000,k};
+}
+function gen(){
+  const count=mode==='k'?12:5,g=mode==='k'?genK:genN,seen=new Set(),out=[];
+  while(out.length<count){const t=g();if(!t)continue;const key=t.n0+'/'+t.d0;if(seen.has(key))continue;seen.add(key);t.mode=mode;out.push(t)}
+  return out;
+}
+
+function frac(fixedD){
+  const w=document.createElement('div');w.className='frac';
+  const n=document.createElement('input');
+  const line=document.createElement('div');line.className='line';
+  let d;
+  if(fixedD){d=document.createElement('div');d.className='nn';d.textContent=fixedD}
+  else d=document.createElement('input');
+  [n,d].forEach(x=>{if(x.tagName==='INPUT'){x.type='text';x.inputMode='numeric';x.maxLength=5;x.autocomplete='off';
+    x.addEventListener('input',()=>{x.value=x.value.replace(/\D/g,'')})}});
+  w.append(n,line,d);
+  return {el:w,n,d,fixed:fixedD,
+    val(){return [parseInt(n.value,10),fixed?fixed:parseInt(d.value,10)]},
+    filled(){return n.value!==''&&(fixed||d.value!=='')},
+    mark(c){[n,d].forEach(x=>{if(x.tagName==='INPUT'){x.classList.remove('good','bad');if(c)x.classList.add(c)}})},
+    lock(){[n,d].forEach(x=>{if(x.tagName==='INPUT')x.readOnly=true})}};
+}
+function staticFrac(n,d){
+  const w=document.createElement('div');w.className='frac';
+  w.innerHTML='<div class="nn">'+n+'</div><div class="line"></div><div class="nn">'+d+'</div>';return w;
+}
+function sign(){const s=document.createElement('span');s.className='sign';s.textContent='=';return s}
+
+function build(t,i){
+  const card=document.createElement('div');card.className='task';
+  const eq=document.createElement('div');eq.className='eq';
+  const lab=document.createElement('span');lab.className='lab';lab.textContent=String.fromCharCode(97+i)+')';
+  const steps=document.createElement('span');steps.className='steps';
+  const ans=frac(t.mode==='n'?1000:null);
+  const plus=document.createElement('button');plus.className='plus';plus.textContent='+';plus.title='Zwischenschritt hinzufügen';plus.setAttribute('aria-label','Zwischenschritt hinzufügen');
+  eq.append(lab,staticFrac(t.n0,t.d0),steps,sign(),ans.el,plus);
+  const tools=document.createElement('div');tools.className='tools';
+  const tip=document.createElement('span');tip.className='tip';
+  if(t.mode==='n'&&t.k>1)tip.textContent='Tipp: Zuerst kürzen, dann erweitern';
+  const msg=document.createElement('span');msg.className='msg';
+  const sol=document.createElement('button');sol.className='sol';sol.textContent='Lösung zeigen';
+  tools.append(tip,msg,sol);
+  card.append(eq,tools);
+
+  const sameVal=(n,d)=>n>0&&d>0&&n*t.d0===t.n0*d;
+  const debounce=(f)=>{let h;return(now)=>{clearTimeout(h);if(now)f();else h=setTimeout(f,650)}};
+
+  function checkAns(){
+    if(t.solved||!ans.filled())return;
+    const [n,d]=ans.val();
+    const eqv=sameVal(n,d);
+    let ok=false,hint='';
+    if(t.mode==='k'){ok=eqv&&gcd(n,d)===1;if(eqv&&!ok)hint='Der Wert stimmt – aber du kannst noch weiter kürzen.'}
+    else{ok=eqv&&d===1000}
+    if(ok){finish(false)}
+    else{ans.mark('bad');msg.className='msg no';msg.textContent=hint||'Leider nicht richtig – probier es nochmal.'}
+  }
+  function finish(revealed){
+    t.solved=true;t.revealed=revealed;ans.mark('good');ans.lock();
+    steps.querySelectorAll('.step').forEach(s=>{if(s._f.n.value===''&&s._f.d.value==='')s.remove();else s._f.lock()});
+    plus.style.display='none';sol.style.display='none';
+    msg.className='msg ok';msg.textContent=revealed?'Lösung angezeigt':'Richtig! 🔥';
+    card.classList.add('done');progress();
+  }
+  const dAns=debounce(checkAns);
+  [ans.n,ans.d].forEach(x=>{if(x.tagName==='INPUT'){
+    x.addEventListener('input',()=>{ans.mark(null);msg.textContent='';dAns()});
+    x.addEventListener('blur',()=>dAns(true));
+    x.addEventListener('keydown',e=>{if(e.key==='Enter')dAns(true)});
+  }});
+
+  plus.onclick=()=>{
+    const f=frac(null),s=document.createElement('span');s.className='step';s._f=f;
+    const rm=document.createElement('button');rm.className='rm';rm.textContent='✕';rm.title='Zwischenschritt entfernen';
+    rm.onclick=()=>s.remove();
+    s.append(sign(),f.el,rm);steps.append(s);
+    const chk=debounce(()=>{
+      if(!f.filled())return;
+      const [n,d]=f.val();f.mark(sameVal(n,d)?'good':'bad');
+    });
+    [f.n,f.d].forEach(x=>{x.addEventListener('input',()=>{f.mark(null);chk()});x.addEventListener('blur',()=>chk(true))});
+    f.n.focus();
+  };
+  sol.onclick=()=>{ans.n.value=t.ansN;if(!ans.fixed)ans.d.value=t.ansD;finish(true)};
+  return card;
+}
+
+function progress(){
+  const done=tasks.filter(t=>t.solved&&!t.revealed).length;
+  document.getElementById('cnt').textContent=done+' / '+tasks.length;
+  document.getElementById('fill').style.width=(done/tasks.length*100)+'%';
+}
+function render(){
+  tasks=gen();
+  const list=document.getElementById('list');list.innerHTML='';
+  tasks.forEach((t,i)=>list.append(build(t,i)));
+  document.getElementById('instr').innerHTML=mode==='k'
+    ?'<b>Kürze vollständig.</b> Denk an die Teilbarkeitsregeln! Mit dem <b>+</b> kannst du Zwischenschritte einfügen.'
+    :'<b>Bring den Bruch auf den Nenner 1000.</b> Erweitere oder kürze – manchmal hilft es, erst zu kürzen und dann zu erweitern.';
+  progress();
+}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));b.classList.add('on');mode=b.dataset.m;render();
+});
+document.getElementById('neu').onclick=render;
+function pf(n,d){const f=v=>v===null?'<span class="pn bx"></span>':'<span class="pn">'+v+'</span>';return '<span class="pf">'+f(n)+'<span class="pl"></span>'+f(d)+'</span>'}
+function buildSheet(){
+  const k=mode==='k',w=document.getElementById('withSol').checked,sg='<span class="pe">=</span>';
+  let h='<h2>Brüche '+(k?'kürzen':'auf den Nenner 1000 bringen')+'</h2><div class="pnm">Name: ______________________ &nbsp;&nbsp; Datum: ____________</div><p class="pi">'+(k?'Kürze vollständig. Beachte die Teilbarkeitsregeln.':'Erweitere oder kürze die Brüche so, dass der Nenner 1000 beträgt.')+' Zwischenschritte kannst du in die freien Felder schreiben.</p><div class="pg '+(k?'two':'one')+'">';
+  tasks.forEach((t,i)=>{
+    const L=String.fromCharCode(97+i)+')';
+    h+='<div class="pt"><b>'+L+'</b>'+pf(t.n0,t.d0)+sg+pf(null,null)+(k?'':sg+pf(null,null))+sg+pf(null,k?null:1000)+(!k&&t.k>1?'<div class="pt2">Tipp: Zuerst kürzen, dann erweitern</div>':'')+'</div>';
+  });
+  h+='</div>';
+  if(w){
+    h+='<div class="sl"><h2>Lösungen</h2><div class="sg">';
+    tasks.forEach((t,i)=>{h+='<div class="si"><b>'+String.fromCharCode(97+i)+')</b>'+pf(t.n0,t.d0)+sg+pf(t.ansN,t.ansD)+'</div>'});
+    h+='</div></div>';
+  }
+  document.getElementById('sheet').innerHTML=h;
+}
+window.addEventListener('beforeprint',buildSheet);
+document.getElementById('prn').onclick=()=>{buildSheet();window.print()};
+render();
+</script>
+</body>
+</html>
